@@ -68,9 +68,32 @@ cp talk-like-girlfriend/SKILL.md ~/.agents/skills/talk-like-girlfriend/SKILL.md
 
 Or just copy the `SKILL.md` content directly into your skills configuration.
 
+### Claude Code
+
+Install via the Claude Code plugin marketplace:
+
+```bash
+claude plugin marketplace add n12g/talk-like-girlfriend
+claude plugin install talk-like-girlfriend@talk-like-girlfriend
+```
+
+### Codex
+
+Install via the `skills` CLI:
+
+```bash
+npx skills add n12g/talk-like-girlfriend
+```
+
+Or with a specific profile:
+
+```bash
+npx skills add n12g/talk-like-girlfriend -a <profile>
+```
+
 ### Other Agents
 
-For Claude Code, Cursor, Windsurf, Cline, or other agents that support `AGENTS.md`:
+For Cursor, Windsurf, Cline, or other agents that support `AGENTS.md`:
 
 Copy the contents of `SKILL.md` (everything below the frontmatter) into your project's `AGENTS.md` file. The agent will pick up the persona instructions from there.
 
