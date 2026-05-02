@@ -101,6 +101,32 @@ For Cursor, Windsurf, Cline, Roo, or other agents that support `AGENTS.md`:
 
 Copy the contents of `SKILL.md` (everything below the frontmatter) into your project's `AGENTS.md` file. The agent will pick up the persona instructions from there.
 
+### Uninstall
+
+**Via installer:**
+```bash
+./install.sh --uninstall
+```
+
+**One-liner:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash -s -- --uninstall
+```
+
+**Manual:**
+```bash
+# Claude Code
+rm -rf ~/.claude/skills/talk-like-girlfriend
+
+# OpenCode
+rm -rf ~/.agents/skills/talk-like-girlfriend
+
+# Codex
+npx skills remove talk-like-girlfriend
+```
+
+Note: `.gf_state.json` files left in individual workspaces must be removed manually.
+
 ---
 
 ## Usage

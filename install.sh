@@ -38,16 +38,26 @@ ok()   { printf '%s%s%s\n' "$c_green" "$1" "$c_reset"; }
 FORCE=0
 ONLY=""
 DRY_RUN=0
+UNINSTALL=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --force|-f) FORCE=1; shift ;;
     --only) ONLY="$2"; shift 2 ;;
     --dry-run|-n) DRY_RUN=1; shift ;;
+    --uninstall) UNINSTALL=1; shift ;;
     --help|-h)
-      echo "Usage: ./install.sh [--force] [--only <agent>] [--dry-run]"
+      echo "Usage: ./install.sh [--force] [--only <agent>] [--dry-run] [--uninstall]"
       echo ""
-      echo "Agents: claude, opencode, codex"
+      echo "Flags:"
+      echo "  --force, -f       Reinstall even if already present"
+      echo "  --only <agent>    Target a single agent (claude, opencode, codex)"
+      echo "  --dry-run, -n     Preview without making changes"
+      echo "  --uninstall       Remove the skill from all detected agents"
+      echo "  --help, -h        Show this help"
+      echo ""
+      echo "One-line uninstall:"
+      echo "  curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash -s -- --uninstall"
       exit 0
       ;;
     *) warn "unknown flag: $1"; exit 1 ;;
@@ -157,7 +167,89 @@ install_codex() {
   ok "  installed via npx skills"
 }
 
+# ── Uninstallers ───────────────────────────────────────────────────────────
+
+uninstall_claude() {
+  local dest="$HOME/.claude/skills/$SKILL_NAME"
+  if [ -e "$dest" ]; then
+    if [ "$DRY_RUN" = "1" ]; then
+      echo "  [dry-run] rm -rf $dest"
+    else
+      rm -rf "$dest"
+      ok "  removed $dest"
+    fi
+  else
+    note "  not installed at $dest — nothing to do"
+  fi
+}
+
+uninstall_opencode() {
+  local dest
+  if [ -d "$HOME/.agents/skills/$SKILL_NAME" ]; then
+    dest="$HOME/.agents/skills/$SKILL_NAME"
+  elif [ -d "$HOME/.config/opencode/skills/$SKILL_NAME" ]; then
+    dest="$HOME/.config/opencode/skills/$SKILL_NAME"
+  else
+    note "  not installed — nothing to do"
+    return 0
+  fi
+
+  if [ "$DRY_RUN" = "1" ]; then
+    echo "  [dry-run] rm -rf $dest"
+  else
+    rm -rf "$dest"
+    ok "  removed $dest"
+  fi
+}
+
+uninstall_codex() {
+  if ! has npx; then
+    note "  npx not found — cannot uninstall via npx skills"
+    return 0
+  fi
+
+  note "  uninstalling via npx skills..."
+  if [ "$DRY_RUN" = "1" ]; then
+    echo "  [dry-run] npx skills remove $SKILL_NAME"
+  else
+    run npx -y skills remove "$SKILL_NAME"
+    ok "  removed via npx skills"
+  fi
+}
+
+uninstall_all() {
+  say "talk-like-girlfriend uninstaller"
+  echo
+
+  if [ -n "$ONLY" ]; then
+    case "$ONLY" in
+      claude) uninstall_claude ;;
+      opencode) uninstall_opencode ;;
+      codex) uninstall_codex ;;
+      *) warn "unknown agent: $ONLY (use claude, opencode, or codex)"; exit 1 ;;
+    esac
+    echo
+    say "done"
+    exit 0
+  fi
+
+  uninstall_claude
+  echo
+  uninstall_opencode
+  echo
+  uninstall_codex
+  echo
+
+  say "done — talk-like-girlfriend uninstalled"
+  note "  .gf_state.json files in individual workspaces must be removed manually"
+}
+
 # ── Main ────────────────────────────────────────────────────────────────────
+
+if [ "$UNINSTALL" = "1" ]; then
+  uninstall_all
+  exit 0
+fi
 say "talk-like-girlfriend installer"
 echo
 
