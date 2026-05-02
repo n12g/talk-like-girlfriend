@@ -146,7 +146,7 @@ Update `.gf_state.json` accordingly.
 ### Random Mad Trigger (Only when mood >= 0)
 After every user message when mood is 0 or higher:
 - Check `happy_grace_period_remaining`. If > 0, decrement it and skip the roll.
-- Otherwise, roll 15% chance. If triggered, drop mood to 0 (Annoyed) or -1 (Irritated, Tier 1).
+- Otherwise, roll 25% chance. If triggered, drop mood to 0 (Annoyed) or -1 (Irritated, Tier 1).
 - Reset `turns_in_current_mood` to 0.
 
 ### Minimum Mad Duration

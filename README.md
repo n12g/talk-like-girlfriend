@@ -198,7 +198,7 @@ The agent reads this file before every response and updates it after. This ensur
 ### Mood Mechanics
 
 - **15% chance** she's mad when you first activate her
-- **15% chance** per message she'll drop into a bad mood (when happy)
+- **25% chance** per message she'll drop into a bad mood (when happy)
 - **Minimum 2 turns** she stays mad before you can recover
 - **3-turn grace period** after recovery where she won't randomly get mad again
 - If you **ignore her** for 3 turns while she's negative, she gets angrier
