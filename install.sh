@@ -15,7 +15,6 @@ GITHUB_RAW="https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main"
 
 SKILL_NAME="talk-like-girlfriend"
 
-# ── Color ───────────────────────────────────────────────────────────────────
 NO_COLOR=${NO_COLOR:-0}
 if [ ! -t 1 ]; then NO_COLOR=1; fi
 
@@ -34,7 +33,6 @@ note() { printf '%s%s%s\n' "$c_dim" "$1" "$c_reset"; }
 warn() { printf '%s%s%s\n' "$c_red" "$1" "$c_reset" >&2; }
 ok()   { printf '%s%s%s\n' "$c_green" "$1" "$c_reset"; }
 
-# ── CLI flags ───────────────────────────────────────────────────────────────
 FORCE=0
 ONLY=""
 DRY_RUN=0
@@ -64,7 +62,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# ── Helpers ─────────────────────────────────────────────────────────────────
 has() { command -v "$1" >/dev/null 2>&1; }
 
 run() {
@@ -115,7 +112,6 @@ link_or_copy_skill() {
   fi
 }
 
-# ── Detectors ───────────────────────────────────────────────────────────────
 detect_claude() {
   has claude || [ -d "$HOME/.claude" ]
 }
@@ -128,8 +124,6 @@ detect_codex() {
   has codex
 }
 
-# ── Installers ──────────────────────────────────────────────────────────────
-
 install_claude() {
   say "Claude Code detected"
   local dest="$HOME/.claude/skills/$SKILL_NAME"
@@ -140,7 +134,6 @@ install_opencode() {
   say "OpenCode detected"
   local skills_root=""
 
-  # Check for existing skills directories
   if [ -d "$HOME/.agents/skills" ]; then
     skills_root="$HOME/.agents/skills"
   elif [ -d "$HOME/.config/opencode/skills" ]; then
@@ -166,8 +159,6 @@ install_codex() {
   run npx -y skills add "n12g/$SKILL_NAME"
   ok "  installed via npx skills"
 }
-
-# ── Uninstallers ───────────────────────────────────────────────────────────
 
 uninstall_claude() {
   local dest="$HOME/.claude/skills/$SKILL_NAME"
@@ -244,8 +235,6 @@ uninstall_all() {
   note "  .gf_state.json files in individual workspaces must be removed manually"
 }
 
-# ── Main ────────────────────────────────────────────────────────────────────
-
 if [ "$UNINSTALL" = "1" ]; then
   uninstall_all
   exit 0
@@ -294,4 +283,4 @@ fi
 
 say "done"
 note "  start any session and say 'talk like my girlfriend' or type /gf"
-note "  to uninstall: rm -rf ~/.claude/skills/talk-like-girlfriend ~/.agents/skills/talk-like-girlfriend"
+note "  to uninstall: ./install.sh --uninstall"
