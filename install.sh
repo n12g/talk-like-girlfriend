@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
-# talk-like-girlfriend — smart multi-agent installer
+# talk-like-girlfriend — multi-agent skill installer
 #
 # One line:
 #   curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash
 #
-# Detects which AI coding agents are on your machine and installs
-# talk-like-girlfriend for each one using its native distribution.
+# Installs the skill for Claude Code, OpenCode, and Codex
+# using each agent's native skill directory.
 
 set -euo pipefail
 
-# ── Constants ──────────────────────────────────────────────────────────────
-REPO="n12g/talk-like-girlfriend"
+REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+SKILL_SRC="$REPO_DIR/skills/talk-like-girlfriend"
+GITHUB_RAW="https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main"
 
-# ── Color setup ────────────────────────────────────────────────────────────
+SKILL_NAME="talk-like-girlfriend"
+
+# ── Color ───────────────────────────────────────────────────────────────────
 NO_COLOR=${NO_COLOR:-0}
 if [ ! -t 1 ]; then NO_COLOR=1; fi
 
@@ -31,142 +34,155 @@ note() { printf '%s%s%s\n' "$c_dim" "$1" "$c_reset"; }
 warn() { printf '%s%s%s\n' "$c_red" "$1" "$c_reset" >&2; }
 ok()   { printf '%s%s%s\n' "$c_green" "$1" "$c_reset"; }
 
-# ── Helpers ────────────────────────────────────────────────────────────────
+# ── CLI flags ───────────────────────────────────────────────────────────────
+FORCE=0
+ONLY=""
+DRY_RUN=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --force|-f) FORCE=1; shift ;;
+    --only) ONLY="$2"; shift 2 ;;
+    --dry-run|-n) DRY_RUN=1; shift ;;
+    --help|-h)
+      echo "Usage: ./install.sh [--force] [--only <agent>] [--dry-run]"
+      echo ""
+      echo "Agents: claude, opencode, codex"
+      exit 0
+      ;;
+    *) warn "unknown flag: $1"; exit 1 ;;
+  esac
+done
+
+# ── Helpers ─────────────────────────────────────────────────────────────────
 has() { command -v "$1" >/dev/null 2>&1; }
 
 run() {
-  echo "  $ $*"
+  if [ "$DRY_RUN" = "1" ]; then
+    echo "  [dry-run] $*"
+    return 0
+  fi
   "$@"
 }
 
-# ── Agent detection ────────────────────────────────────────────────────────
-detect_opencode() {
-  has opencode || [ -d "$HOME/.config/opencode" ] || [ -f "$HOME/.config/opencode/AGENTS.md" ]
+download_skill() {
+  local dest="$1"
+  mkdir -p "$dest"
+  curl -fsSL "$GITHUB_RAW/skills/$SKILL_NAME/SKILL.md" -o "$dest/SKILL.md"
 }
 
+link_or_copy_skill() {
+  local dest="$1"
+
+  if [ -e "$dest" ] && [ "$FORCE" = "0" ]; then
+    note "  already installed at $dest (use --force to reinstall)"
+    return 0
+  fi
+
+  if [ -e "$dest" ]; then
+    rm -rf "$dest"
+  fi
+
+  mkdir -p "$(dirname "$dest")"
+
+  if [ -d "$SKILL_SRC" ]; then
+    # Running from inside the repo — symlink for live updates
+    if [ "$DRY_RUN" = "1" ]; then
+      echo "  [dry-run] ln -s $SKILL_SRC $dest"
+    else
+      ln -sfn "$SKILL_SRC" "$dest"
+      ok "  symlinked $dest -> $SKILL_SRC"
+    fi
+  else
+    # Running via curl pipe — download from GitHub
+    note "  downloading from GitHub..."
+    if [ "$DRY_RUN" = "1" ]; then
+      echo "  [dry-run] curl $GITHUB_RAW/skills/$SKILL_NAME/SKILL.md -> $dest/SKILL.md"
+    else
+      download_skill "$dest"
+      ok "  downloaded to $dest/SKILL.md"
+    fi
+  fi
+}
+
+# ── Detectors ───────────────────────────────────────────────────────────────
 detect_claude() {
-  has claude
+  has claude || [ -d "$HOME/.claude" ]
+}
+
+detect_opencode() {
+  has opencode || [ -d "$HOME/.config/opencode" ] || [ -d "$HOME/.agents" ]
 }
 
 detect_codex() {
   has codex
 }
 
-# ── Install functions ──────────────────────────────────────────────────────
-install_opencode() {
-  say "→ OpenCode detected"
-  
-  local skills_dir=""
-  if [ -d "$HOME/.agents/skills" ]; then
-    skills_dir="$HOME/.agents/skills"
-  elif [ -d "$HOME/.config/opencode/skills" ]; then
-    skills_dir="$HOME/.config/opencode/skills"
-  else
-    skills_dir="$HOME/.agents/skills"
-    mkdir -p "$skills_dir"
-  fi
-  
-  local target_dir="$skills_dir/talk-like-girlfriend"
-  
-  if [ -d "$target_dir" ]; then
-    note "  talk-like-girlfriend already installed at $target_dir"
-    note "  (delete it and re-run to reinstall)"
-    return 0
-  fi
-  
-  mkdir -p "$target_dir"
-  
-  if [ -f "SKILL.md" ]; then
-    cp "SKILL.md" "$target_dir/"
-    ok "  installed from local SKILL.md"
-  else
-    note "  downloading from GitHub..."
-    curl -fsSL "https://raw.githubusercontent.com/$REPO/main/SKILL.md" -o "$target_dir/SKILL.md"
-    ok "  downloaded and installed"
-  fi
-  
-  note "  location: $target_dir/SKILL.md"
-}
+# ── Installers ──────────────────────────────────────────────────────────────
 
 install_claude() {
-  say "→ Claude Code detected"
-  
-  if ! has claude; then
-    warn "  claude CLI not found on PATH"
-    return 1
-  fi
-  
-  note "  installing via Claude plugin marketplace..."
-  
-  if claude plugin list 2>/dev/null | grep -qi "talk-like-girlfriend"; then
-    note "  talk-like-girlfriend plugin already installed"
-    return 0
-  fi
-  
-  if run claude plugin marketplace add "$REPO"; then
-    if run claude plugin install "talk-like-girlfriend@talk-like-girlfriend"; then
-      ok "  installed successfully"
-    else
-      warn "  plugin install failed"
-      return 1
-    fi
+  say "Claude Code detected"
+  local dest="$HOME/.claude/skills/$SKILL_NAME"
+  link_or_copy_skill "$dest"
+}
+
+install_opencode() {
+  say "OpenCode detected"
+  local skills_root=""
+
+  # Check for existing skills directories
+  if [ -d "$HOME/.agents/skills" ]; then
+    skills_root="$HOME/.agents/skills"
+  elif [ -d "$HOME/.config/opencode/skills" ]; then
+    skills_root="$HOME/.config/opencode/skills"
   else
-    warn "  marketplace add failed"
-    return 1
+    skills_root="$HOME/.agents/skills"
+    mkdir -p "$skills_root"
   fi
+
+  local dest="$skills_root/$SKILL_NAME"
+  link_or_copy_skill "$dest"
 }
 
 install_codex() {
-  say "→ Codex CLI detected"
-  
+  say "Codex detected"
+
   if ! has npx; then
     warn "  npx not found — install Node.js (https://nodejs.org) and re-run"
     return 1
   fi
-  
+
   note "  installing via npx skills..."
-  
-  if run npx -y skills add "$REPO" -a codex; then
-    ok "  installed successfully"
-  else
-    warn "  npx skills add failed"
-    return 1
-  fi
+  run npx -y skills add "n12g/$SKILL_NAME"
+  ok "  installed via npx skills"
 }
 
-install_generic_skills() {
-  say "→ no specific agents detected — trying generic npx skills installer"
-  
-  if ! has npx; then
-    warn "  npx not found — install Node.js (https://nodejs.org) and re-run"
-    return 1
-  fi
-  
-  note "  this will auto-detect your agent..."
-  
-  if run npx -y skills add "$REPO"; then
-    ok "  installed successfully"
-  else
-    warn "  npx skills add failed"
-    return 1
-  fi
-}
-
-# ── Main ───────────────────────────────────────────────────────────────────
-say "💕 talk-like-girlfriend installer"
-note "  $REPO"
+# ── Main ────────────────────────────────────────────────────────────────────
+say "talk-like-girlfriend installer"
 echo
+
+if [ -n "$ONLY" ]; then
+  case "$ONLY" in
+    claude) install_claude ;;
+    opencode) install_opencode ;;
+    codex) install_codex ;;
+    *) warn "unknown agent: $ONLY (use claude, opencode, or codex)"; exit 1 ;;
+  esac
+  echo
+  say "done"
+  exit 0
+fi
 
 INSTALLED=0
 
-if detect_opencode; then
-  install_opencode
+if detect_claude; then
+  install_claude
   INSTALLED=$((INSTALLED + 1))
   echo
 fi
 
-if detect_claude; then
-  install_claude
+if detect_opencode; then
+  install_opencode
   INSTALLED=$((INSTALLED + 1))
   echo
 fi
@@ -178,10 +194,12 @@ if detect_codex; then
 fi
 
 if [ "$INSTALLED" -eq 0 ]; then
-  install_generic_skills
-  echo
+  warn "no supported agent detected"
+  warn "  looked for: claude, opencode, codex"
+  warn "  try installing manually or use --only <agent>"
+  exit 1
 fi
 
-say "💕 done"
+say "done"
 note "  start any session and say 'talk like my girlfriend' or type /gf"
-note "  uninstall: see https://github.com/$REPO#installation"
+note "  to uninstall: rm -rf ~/.claude/skills/talk-like-girlfriend ~/.agents/skills/talk-like-girlfriend"

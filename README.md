@@ -60,54 +60,39 @@ She's not malicious — she's just emotionally processing your code out loud.
 curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash
 ```
 
-This detects which agents you have (OpenCode, Claude Code, Codex, etc.) and installs for each one automatically.
+Detects Claude Code, OpenCode, and Codex. Installs for each using its native skill directory.
 
-### OpenCode
-
-**Via installer:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash
-```
-
-**Manual:**
-```bash
-# Clone the repo
-git clone https://github.com/n12g/talk-like-girlfriend.git
-
-# Copy SKILL.md to your OpenCode skills directory
-cp talk-like-girlfriend/SKILL.md ~/.agents/skills/talk-like-girlfriend/SKILL.md
-```
-
-Or just copy the `SKILL.md` content directly into your skills configuration.
+Flags:
+- `--force` / `-f` — reinstall even if already present
+- `--only claude|opencode|codex` — install for a single agent
+- `--dry-run` / `-n` — preview what would happen
 
 ### Claude Code
 
-**Via marketplace:**
+```bash
+# Clone and symlink for live updates
+git clone https://github.com/n12g/talk-like-girlfriend.git ~/talk-like-girlfriend
+ln -s ~/talk-like-girlfriend/skills/talk-like-girlfriend ~/.claude/skills/talk-like-girlfriend
+```
+
+Or use the Claude plugin marketplace:
 ```bash
 claude plugin marketplace add n12g/talk-like-girlfriend
 claude plugin install talk-like-girlfriend@talk-like-girlfriend
 ```
 
-**Via installer:**
+### OpenCode
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash
+# Clone and symlink for live updates
+git clone https://github.com/n12g/talk-like-girlfriend.git ~/talk-like-girlfriend
+ln -s ~/talk-like-girlfriend/skills/talk-like-girlfriend ~/.agents/skills/talk-like-girlfriend
 ```
 
 ### Codex
 
-**Via skills CLI:**
 ```bash
 npx skills add n12g/talk-like-girlfriend
-```
-
-Or with a specific profile:
-```bash
-npx skills add n12g/talk-like-girlfriend -a <profile>
-```
-
-**Via installer:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash
 ```
 
 ### Other Agents
