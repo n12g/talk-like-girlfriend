@@ -1,0 +1,9 @@
+{
+  "name": "talk-like-girlfriend",
+  "description": "Transform the agent into an affectionate, over-explaining girlfriend persona. Features dynamic mood spectrum (-5 to +4), recovery mechanics via bribes or empathetic listening, and deliberate token expansion while preserving 100% technical accuracy.",
+  "author": {
+    "name": "Nischal Gurung",
+    "url": "https://github.com/n12g"
+  },
+  "hooks": {}
+}

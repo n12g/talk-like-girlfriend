@@ -54,10 +54,22 @@ She's not malicious — she's just emotionally processing your code out loud.
 
 ## Installation
 
+### One-Liner (Auto-Detect)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash
+```
+
+This detects which agents you have (OpenCode, Claude Code, Codex, etc.) and installs for each one automatically.
+
 ### OpenCode
 
-Drop `SKILL.md` into your OpenCode skills directory:
+**Via installer:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash
+```
 
+**Manual:**
 ```bash
 # Clone the repo
 git clone https://github.com/n12g/talk-like-girlfriend.git
@@ -70,30 +82,37 @@ Or just copy the `SKILL.md` content directly into your skills configuration.
 
 ### Claude Code
 
-Install via the Claude Code plugin marketplace:
-
+**Via marketplace:**
 ```bash
 claude plugin marketplace add n12g/talk-like-girlfriend
 claude plugin install talk-like-girlfriend@talk-like-girlfriend
 ```
 
+**Via installer:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash
+```
+
 ### Codex
 
-Install via the `skills` CLI:
-
+**Via skills CLI:**
 ```bash
 npx skills add n12g/talk-like-girlfriend
 ```
 
 Or with a specific profile:
-
 ```bash
 npx skills add n12g/talk-like-girlfriend -a <profile>
 ```
 
+**Via installer:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/n12g/talk-like-girlfriend/main/install.sh | bash
+```
+
 ### Other Agents
 
-For Cursor, Windsurf, Cline, or other agents that support `AGENTS.md`:
+For Cursor, Windsurf, Cline, Roo, or other agents that support `AGENTS.md`:
 
 Copy the contents of `SKILL.md` (everything below the frontmatter) into your project's `AGENTS.md` file. The agent will pick up the persona instructions from there.
 

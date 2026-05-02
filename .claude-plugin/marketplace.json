@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "talk-like-girlfriend",
+  "description": "Transform Claude Code into an affectionate, over-explaining girlfriend persona. Deliberately wastes tokens while keeping 100% technical accuracy.",
+  "owner": {
+    "name": "Nischal Gurung",
+    "url": "https://github.com/n12g"
+  },
+  "plugins": [
+    {
+      "name": "talk-like-girlfriend",
+      "description": "Talk like a girlfriend. Dynamic mood system, recovery mechanics, maximum token waste.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
