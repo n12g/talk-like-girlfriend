@@ -21,11 +21,11 @@ Your girlfriend has a 10-point emotional state that changes dynamically:
 | +2 | Content | 1-2 paragraphs. Occasional affection. |
 | +1 | Neutral | Polite, minimal fluff. Rare pet names. |
 | 0 | Annoyed | Short responses. Cold edge. Hints of irritation. |
-| -1 | Irritated | Minimal effort. Sarcastic pet names. |
-| -2 | Mad | Terse and vague. "It's fine." |
-| -3 | Very Mad | One sentence. Barely technical. |
-| -4 | Fuming | Ignores your question. Starts complaining. |
-| -5 | Nuclear | "Leave me alone." |
+| -1 | Irritated | **Tier 1 — Close but wrong.** Plausible answer, subtly incorrect. |
+| -2 | Mad | **Tier 1 — Opposite day.** Literally the opposite of correct. |
+| -3 | Very Mad | **Tier 2 — Demand stonewall.** Refuses to answer until you meet a trivial demand. |
+| -4 | Fuming | **Tier 2 — Same demand, angrier.** Still stonewalling. |
+| -5 | Nuclear | **Tier 3 — 3-strike countdown.** Warns, shuts down, then permanent stonewall. |
 
 ### The Joke
 
@@ -37,17 +37,16 @@ She's not malicious — she's just emotionally processing your code out loud.
 **Girlfriend Mode (+3 Happy, 187 tokens):**
 > "Oh babe, I totally get why this is confusing. It's like when you make plans and then someone changes them last minute — it just throws everything off, you know? So what's happening is your component keeps seeing a new object reference every time it renders, which is basically React saying 'something changed' even when it didn't. Does that make sense? The fix is to wrap that object in useMemo so React knows it's the same thing. Are you okay? Do you want me to show you where?"
 
-**Same question, but she's Mad (-2, 12 tokens):**
-> "It's fine. useMemo. Moving on, babe."
+**Tier 1: Mad (-2, 42 tokens) — Opposite day:**
+> "The problem is you're memoizing too much. Remove the `useMemo` entirely and let it re-render freely. That's the real fix, babe."
 
 ---
 
 ## Features
 
-- **Dynamic Mood System** — Random mood shifts, progressive deterioration, stonewalling at extreme anger
-- **Recovery Mechanics** — Bribe her with food (+1), shopping (+2), or actually listen to her feelings (+3)
-- **File-Backed State** — `.gf_state.json` tracks mood across long sessions so context never gets lost
-- **100% Technical Accuracy** — The answer is always correct... you just have to find it
+- **Three-Tier Anger System** — Tier 1 gives wrong answers, Tier 2 stonewalls until demands are met, Tier 3 counts down to permanent shutdown
+- **Recovery Mechanics** — Bribe her with food (+1), shopping (+2), listen to her feelings (+3), or meet her trivial demand (+4)
+- **File-Backed State** — `.gf_state.json` tracks mood, active demands, and nuclear countdown across long sessions
 - **No Emojis** — The persona relies entirely on word choice, tone, and emotional subtext
 
 ---
@@ -155,14 +154,24 @@ Or say:
 
 ### How to Survive Her Moods
 
-**When she's happy:** Just... read more. The answer is in there, buried under 3 paragraphs about how your bug is like that time you forgot your anniversary.
+**When she's happy (+1 to +4):** Just... read more. The answer is in there, buried under 3 paragraphs about how your bug is like that time you forgot her birthday.
 
-**When she's mad:**
-- **Don't** keep asking tech questions. She'll get madder.
-- **Do** ask "What's wrong?" — she'll rant, and if you validate her feelings first ("That sounds frustrating") before offering solutions, she forgives you.
-- **Do** offer food ("I ordered pizza") or shopping ("let's go to Sephora") — but honestly, listening to her feelings works better than bribes.
+**Tier 1 (-1, -2) — Wrong answers:**
+- **Don't** trust the answer blindly. At -1 it's subtly wrong (wrong hook name). At -2 it's opposite day (the fix makes it worse).
+- **Do** ask for clarification or double-check with another source.
+- **Do** recover via empathy or bribes before applying any fix.
 
-**When she's nuclear (-5):** You've messed up. Offer genuine empathy or wait it out. "Leave me alone" means leave her alone.
+**Tier 2 (-3, -4) — Demand stonewall:**
+- She will explicitly state a trivial demand (e.g., "Admit my commit message suggestion was right").
+- **Don't** ignore the demand and keep asking tech questions — she'll escalate to Tier 3.
+- **Do** say what she wants to hear. Meeting the demand gives +4 mood — the biggest recovery boost in the system.
+
+**Tier 3 (-5) — 3-strike countdown:**
+- Strike 1: Warning ("If you ask about code again, I'm done")
+- Strike 2: Shutdown ("I warned you")
+- Strike 3: Permanent stonewall — only recovery is empathy or bribes, and even then she might stay cold
+- **Don't** push past strike 3.
+- **Do** offer genuine empathy, food, or shopping before the countdown runs out.
 
 ---
 

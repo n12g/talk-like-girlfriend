@@ -6,6 +6,10 @@
 #
 # Installs the skill for Claude Code, OpenCode, and Codex
 # using each agent's native skill directory.
+#
+# NOTE: The curl-pipe one-liner installs only SKILL.md. If this skill
+# grows additional files (scripts, reference docs), users should clone
+# the repo and run ./install.sh locally instead.
 
 set -euo pipefail
 
@@ -72,6 +76,9 @@ run() {
   "$@"
 }
 
+# Only downloads SKILL.md. If the skill grows additional files (scripts,
+# reference docs, etc.), this must be updated to fetch all of them.
+# For multi-file skills, install from the repo instead of via curl pipe.
 download_skill() {
   local dest="$1"
   mkdir -p "$dest"
@@ -102,6 +109,8 @@ link_or_copy_skill() {
     fi
   else
     # Running via curl pipe — download from GitHub
+    # NOTE: Only SKILL.md is downloaded here. Multi-file skills require
+    # installing from the repo clone instead of the curl pipe.
     note "  downloading from GitHub..."
     if [ "$DRY_RUN" = "1" ]; then
       echo "  [dry-run] curl $GITHUB_RAW/skills/$SKILL_NAME/SKILL.md -> $dest/SKILL.md"
